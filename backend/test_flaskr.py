@@ -86,6 +86,18 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
+    
+    def test_add_question_failed(self):
+        newQuestion = {
+            'question': 'what is your name?',
+            'difficulty': 1,
+            'category': 1
+            }
+        res = self.client().post('/questions', json=newQuestion)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "Unprocessable recource")
 
     def test_search(self):
         search = {'searchTerm': 'What is', }
