@@ -225,38 +225,41 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not.
   '''
-  @app/route('/quizzes', methods=['POST'])
-  def quiz():
-      body = request.get_json()
-      quiz_category = body.get('quiz_category')
-      previous_questions = body.get('previous_questions')
+ @app/route('/quizzes', methods=['POST'])
+ def quiz():
+     body = request.get_json()
+     quiz_category = body.get('quiz_category')
+     previous_questions = body.get('previous_questions')
 
-      try:
-          if (quiz_category['id']==0):
-              questions = Question.query.all()
-          else:
-              questions = Question.query.filter_by(category=quiz_category['id']).all()
-              random_number = random.randint(0, len(questions)-1)
-              next_question = questions[random_number]
+     try:
+         if (quiz_category['id']==0):
+             questions = Question.query.all()
+         else:
+             questions = Question.query.filter_by(category=quiz_category['id']).all()
 
-          present_question = True
-          while next_question.id not in previous_questions:
-              next_question = questions[random_number]
-              return jsonify({
-                  "success": True,
-                  "question": {
-                      "answer": next_question.answer,
-                      "category": next_question.category,
-                      "difficulty": next_question.difficulty,
-                      "id": next_question.id,
-                      "question": next_question.question
-                      },
-                  "previousQuestions": previous_questions
-                  })
+         random_number = random.randint(0, len(questions)-1)
+         random_number_list = []
+         while random_number not in random_number_list:
+             next_question =questions[random_number]
+             if next_question.id not in previous_questions:
+                 return jsonify({
+                     "success": True,
+                     "question": {
+                         "answer": next_question.answer,
+                         "category": next_question.category,
+                         "difficulty": next_question.difficulty,
+                         "id": next_question.id,
+                         "question": next_question.question
+                         },
+                     "previousQuestions": previous_questions
+                     })
+         random_number_list.append(random_number)
+         random_number = random.randint(0, len(questions)-1)
 
-        except Exception as e:
-            print(e)
-            abort(404)
+
+     except Exception as e:
+         print(e)
+         abort(404)
   '''
   @TODO:
   Create error handlers for all expected errors
